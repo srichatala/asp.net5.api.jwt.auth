@@ -8,7 +8,8 @@ namespace asp.net5.api.jwt.auth.Service.Interface
 {
     public interface ICustomerService
     {
-        bool IsValidateCustomer(LoginRequest customer);
-        CustomerDto GetCustomer(string userName);
+        Task<bool> IsValidateCustomer(LoginRequest customer);
+        Task<bool> Regstration(Customer customer);
+        Task<CustomerDto> GetCustomer(string userName);
     }
 }

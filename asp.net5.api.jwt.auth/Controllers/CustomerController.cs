@@ -1,11 +1,13 @@
 ﻿using asp.net5.api.jwt.auth.Model;
 using asp.net5.api.jwt.auth.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace asp.net5.api.jwt.auth.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/customer")]
     [ApiController]
     [Authorize]
     public class CustomerController : ControllerBase
@@ -20,19 +22,39 @@ namespace asp.net5.api.jwt.auth.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-
-            if (!_customerService.IsValidateCustomer(request))
+            var isValid = await _customerService.IsValidateCustomer(request);
+            if (!isValid)
             {
                 return Unauthorized();
             }
+            var jwtResult = _jwtAuthService.GenerateTokens(request.UserName);
+            return Ok(new JwtResponse
+            {
+                UserName = request.UserName,
+                AccessToken = jwtResult.AccessToken,
+            });
+        }
 
+        [AllowAnonymous]
+        [HttpPost("registration")]
+        public async Task<IActionResult> Registration([FromBody] Customer request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            bool registered = await _customerService.Regstration(request);
+            if (!registered)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Somethng went wrong");
 
+            }
             var jwtResult = _jwtAuthService.GenerateTokens(request.UserName);
             return Ok(new JwtResponse
             {
@@ -43,11 +65,15 @@ namespace asp.net5.api.jwt.auth.Controllers
 
         [HttpGet("customer")]
         [Authorize]
-        public IActionResult GetCurrentUser()
+        public async Task<IActionResult> GetCurrentUser()
         {
             var userName = User.Identity?.Name;
-            var customer = _customerService.GetCustomer(userName);
-            return Ok(customer);
+            var customer = await _customerService.GetCustomer(userName);
+            if(customer != null)
+            {
+                return Ok(customer);
+            }
+            return NoContent();
         }
     }
 }

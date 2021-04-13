@@ -17,7 +17,7 @@ namespace asp.net5.api.jwt.auth.Service
             _appSettings = options.Value;
         }
 
-        public bool IsValidateCustomer(LoginRequest request)
+        public async Task<bool> IsValidateCustomer(LoginRequest request)
         {
             using (SqlConnection sqlConnection = new SqlConnection(_appSettings.ConnectionString))
             {
@@ -25,16 +25,13 @@ namespace asp.net5.api.jwt.auth.Service
                 {
                     sqlConnection.Open();
                     SqlCommand sqlCmd = new SqlCommand("SELECT * FROM Customer WHERE UserName=" + "'" + request.UserName + "' AND Password=" + "'" + request.Password + "'", sqlConnection);
-                    SqlDataReader reader = sqlCmd.ExecuteReader();
+                    SqlDataReader reader = await sqlCmd.ExecuteReaderAsync();
                     if (reader.HasRows)
                     {
                         return true;
                     }
                 }
-                catch (Exception ex)
-                {
-
-                }
+                catch (Exception ex) { }
                 finally
                 {
                     sqlConnection.Close();
@@ -42,7 +39,7 @@ namespace asp.net5.api.jwt.auth.Service
             }
             return false;
         }
-        public CustomerDto GetCustomer(string userName)
+        public async Task<CustomerDto> GetCustomer(string userName)
         {
             var customer = new CustomerDto();
             using (SqlConnection sqlConnection = new SqlConnection(_appSettings.ConnectionString))
@@ -51,7 +48,7 @@ namespace asp.net5.api.jwt.auth.Service
                 {
                     sqlConnection.Open();
                     SqlCommand sqlCmd = new SqlCommand("SELECT * FROM Customer WHERE UserName=" + "'" + userName + "'", sqlConnection);
-                    SqlDataReader reader = sqlCmd.ExecuteReader();
+                    SqlDataReader reader = await sqlCmd.ExecuteReaderAsync();
                     if (reader.HasRows)
                     {
                         while (reader.Read())
@@ -65,16 +62,40 @@ namespace asp.net5.api.jwt.auth.Service
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-
-                }
+                catch (Exception ex) { }
                 finally
                 {
                     sqlConnection.Close();
                 }
             }
             return customer;
+        }
+
+        public async Task<bool> Regstration(Customer customer)
+        {
+            bool inserted = false;
+            using (SqlConnection sqlConnection = new SqlConnection(_appSettings.ConnectionString))
+            {
+                try
+                {
+                    sqlConnection.Open();
+                    string query = "INSERT INTO Customer(UserName,Password,Name)values(@userName,@password,@name)";
+                    using (SqlCommand cmd = new SqlCommand(query, sqlConnection))
+                    {
+                        cmd.Parameters.Add("@userName", System.Data.SqlDbType.NVarChar, 50).Value = customer.UserName;
+                        cmd.Parameters.Add("@password", System.Data.SqlDbType.NVarChar, 50).Value = customer.Password;
+                        cmd.Parameters.Add("@name", System.Data.SqlDbType.NVarChar, 50).Value = customer.Name;
+                        await cmd.ExecuteNonQueryAsync();
+                        inserted = true;
+                    };
+                }
+                catch (Exception ex) { }
+                finally
+                {
+                    sqlConnection.Close();
+                }
+            }
+            return inserted;
         }
     }
 }
