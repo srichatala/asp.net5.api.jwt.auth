@@ -36,11 +36,13 @@ namespace asp.net5.api.jwt.auth
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(appSettings.SecretKey)),
-                ValidateIssuer = false,
-                ValidateAudience = false,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.SecretKey)),
+                ValidateIssuer = true,
+                ValidIssuer = appSettings.Issuer,
+                ValidateAudience = true,
+                ValidAudience = appSettings.Issuer,
                 ValidateLifetime = true,
-                RequireExpirationTime = false
+                ClockSkew = TimeSpan.FromMinutes(1)
             };
             services.AddSingleton(tokenValidationParameters);
             services.AddAuthentication(x =>

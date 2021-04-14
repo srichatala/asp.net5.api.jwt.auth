@@ -19,26 +19,30 @@ namespace asp.net5.api.jwt.auth.Service
         public JwtAuthService(IOptions<AppSettings> options)
         {
             _appSettings = options.Value;
-            _secret = Encoding.ASCII.GetBytes(options.Value.SecretKey);
+            _secret = Encoding.UTF8.GetBytes(options.Value.SecretKey);
         }
 
         public JwtResponse GenerateTokens(string userName)
         {
-            var claims = new[] {
-                new Claim(ClaimTypes.Name, userName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            var tokenDescriptor = new SecurityTokenDescriptor {
+                Subject = new ClaimsIdentity(new[] { new Claim("sub", "customer") }),
+                Issuer = _appSettings.Issuer,
+                Claims = new Dictionary<string, object>
+                {
+                    ["email"] = userName,
+                },
+                IssuedAt = DateTime.Now,
+                NotBefore = DateTime.Now,
+                Expires = DateTime.Now.AddMinutes(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_secret), SecurityAlgorithms.HmacSha256Signature)
             };
-            var jwtToken = new JwtSecurityToken(
-                _appSettings.Issuer,
-                _appSettings.Issuer,
-                claims,
-                expires: DateTime.Now.AddMinutes(1),
-                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(_secret), SecurityAlgorithms.HmacSha256Signature));
-            var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var serializedToken = tokenHandler.WriteToken(token);
 
             return new JwtResponse
             {
-                AccessToken = accessToken
+                AccessToken = serializedToken
             };
         }
     }
