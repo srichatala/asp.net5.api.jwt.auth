@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace asp.net5.api.jwt.auth.Model
 {
-    public class JwtResponse
+    public class RefreshTokenRequest
     {
-        public string AccessToken { get; set; }
-        public RefreshToken RefreshToken { get; set; }
+        [JsonPropertyName("refreshToken")]
+        public string RefreshToken { get; set; }
     }
 }

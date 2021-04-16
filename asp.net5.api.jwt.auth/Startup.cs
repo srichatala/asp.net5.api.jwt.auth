@@ -82,9 +82,11 @@ namespace asp.net5.api.jwt.auth
                 });
             });
 
+            services.AddCors();
 
-            services.AddScoped<ICustomerService, CustomerService>();
-            services.AddScoped<IJwtAuthService, JwtAuthService>();
+            services.AddSingleton<ICustomerService, CustomerService>();
+            services.AddSingleton<IJwtAuthService, JwtAuthService>();
+            services.AddHostedService<JwtRefreshTokenCache>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -96,6 +98,12 @@ namespace asp.net5.api.jwt.auth
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "asp.net5.api.jwt.auth v1"));
             }
+
+            app.UseCors(x => x
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .SetIsOriginAllowed(origin => true) // allow any origin
+              .AllowCredentials()); // allow credentials
 
             app.UseRouting();
 

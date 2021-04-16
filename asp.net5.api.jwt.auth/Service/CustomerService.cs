@@ -82,7 +82,7 @@ namespace asp.net5.api.jwt.auth.Service
                     string query = "INSERT INTO Customer(UserName,Password,Name)values(@userName,@password,@name)";
                     using (SqlCommand cmd = new SqlCommand(query, sqlConnection))
                     {
-                        cmd.Parameters.Add("@userName", System.Data.SqlDbType.NVarChar, 50).Value = customer.UserName;
+                        cmd.Parameters.Add("@userName", System.Data.SqlDbType.NVarChar, 50).Value = customer.Email;
                         cmd.Parameters.Add("@password", System.Data.SqlDbType.NVarChar, 50).Value = customer.Password;
                         cmd.Parameters.Add("@name", System.Data.SqlDbType.NVarChar, 50).Value = customer.Name;
                         await cmd.ExecuteNonQueryAsync();

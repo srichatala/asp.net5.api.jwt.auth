@@ -9,5 +9,8 @@ namespace asp.net5.api.jwt.auth.Service.Interface
     public interface IJwtAuthService
     {
         JwtResponse GenerateTokens(string userName);
+        void RemoveExpiredRefreshTokens(DateTime now);
+        void RemoveRefreshTokenByUserName(string userName);
+        JwtResponse Refresh(string refreshToken, string accessToken, DateTime now);
     }
 }
