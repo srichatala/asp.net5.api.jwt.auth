@@ -22,15 +22,27 @@ namespace asp.net5.api.jwt.auth.Controllers
                 new ProductDto
                 {
                     Id = 1,
-                    Name = "Asus ROG",
+                    ProductName = "Asus ROG",
                     Price = 1500
                 },
                  new ProductDto
                 {
                     Id = 2,
-                    Name = "iPhone ",
+                    ProductName = "iPhone",
                     Price = 1100
                 },
+                new ProductDto
+                {
+                    Id = 3,
+                    ProductName = "Pixel 5",
+                    Price = 1100
+                },
+                new ProductDto
+                {
+                    Id = 4,
+                    ProductName = "Samsung",
+                    Price = 1100
+                }
             };
 
             return Ok(list);

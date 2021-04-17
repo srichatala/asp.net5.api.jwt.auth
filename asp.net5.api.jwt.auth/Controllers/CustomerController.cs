@@ -70,7 +70,7 @@ namespace asp.net5.api.jwt.auth.Controllers
         [Authorize]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            var userName = User.Identity?.Name;
+            var userName = User?.FindFirst(x => x.Type.Equals("Name"))?.Value;
 
             if (string.IsNullOrWhiteSpace(request.RefreshToken))
             {
