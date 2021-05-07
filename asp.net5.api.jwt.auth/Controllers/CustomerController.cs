@@ -47,7 +47,7 @@ namespace asp.net5.api.jwt.auth.Controllers
 
         [AllowAnonymous]
         [HttpPost("registration")]
-        public async Task<IActionResult> Registration([FromBody] Customer request)
+        public async Task<IActionResult> Registration([FromBody] User request)
         {
             if (!ModelState.IsValid)
             {

@@ -7,15 +7,13 @@ using System.Threading.Tasks;
 
 namespace asp.net5.api.jwt.auth.Model
 {
-    public class Customer
+    public class User
     {
-        [Required]
-        [JsonPropertyName("email")]
+        public int Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string Email { get; set; }
-        [Required]
-        [JsonPropertyName("password")]
         public string Password { get; set; }
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string PhoneNumber { get; set; }
     }
 }
