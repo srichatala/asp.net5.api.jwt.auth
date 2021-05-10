@@ -15,10 +15,8 @@ namespace asp.net5.api.jwt.auth.Model
         public string FirstName { get; set; }
         [JsonPropertyName("lastname")]
         public string LastName { get; set; }
-        [Required]
         [JsonPropertyName("email")]
         public string Email { get; set; }
-        [Required]
         [JsonPropertyName("password")]
         public string Password { get; set; }
         [JsonPropertyName("phonenumber")]
